@@ -104,8 +104,8 @@ class _EditorState extends State<_Editor> {
                     height: 44,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      color: _icon == e.key ? cs.primary.withAlpha(40) : null,
-                      border: Border.all(color: _icon == e.key ? cs.primary : cs.onSurface.withAlpha(30)),
+                      color: _icon == e.key ? cs.primary.withAlpha(46) : cs.onSurface.withAlpha(14),
+                      border: _icon == e.key ? Border.all(color: cs.primary, width: 2) : null,
                     ),
                     child: Icon(e.value),
                   ),

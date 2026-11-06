@@ -25,6 +25,8 @@ const Map<String, Map<String, String>> _m = {
     'errMany': 'Too many attempts. Try again later.', 'errGeneric': 'Something went wrong. Please try again.',
     'errRequired': 'Required', 'errEmail': 'Enter a valid email.', 'edit': 'Edit',
     'confirm': 'Confirm', 'accountSection': 'Account', 'appearance': 'Appearance',
+    'checkSpam': 'The email can take a minute and often lands in your Spam or Promotions folder.',
+    'verifyShort': 'Verify your email · check Spam too',
   },
   'fr': {
     'appName': 'Habidz', 'tagline': 'Construisez vos habitudes, un carré à la fois.',
@@ -50,6 +52,8 @@ const Map<String, Map<String, String>> _m = {
     'errMany': 'Trop de tentatives. Réessayez plus tard.', 'errGeneric': "Une erreur s'est produite. Réessayez.",
     'errRequired': 'Obligatoire', 'errEmail': 'Entrez un e-mail valide.', 'edit': 'Modifier',
     'confirm': 'Confirmer', 'accountSection': 'Compte', 'appearance': 'Apparence',
+    'checkSpam': "L'e-mail peut prendre une minute et arrive souvent dans vos Spams ou Promotions.",
+    'verifyShort': 'Vérifiez votre e-mail · regardez aussi les spams',
   },
   'ar': {
     'appName': 'هابيدز', 'tagline': 'ابنِ عاداتك، مربعاً بعد مربع.',
@@ -74,6 +78,8 @@ const Map<String, Map<String, String>> _m = {
     'errMany': 'محاولات كثيرة. حاول لاحقاً.', 'errGeneric': 'حدث خطأ. حاول مرة أخرى.',
     'errRequired': 'مطلوب', 'errEmail': 'أدخل بريداً صحيحاً.', 'edit': 'تعديل',
     'confirm': 'تأكيد', 'accountSection': 'الحساب', 'appearance': 'المظهر',
+    'checkSpam': 'قد تستغرق الرسالة دقيقة وغالباً تصل إلى البريد العشوائي (Spam) أو الترويجات.',
+    'verifyShort': 'أكّد بريدك · تحقق من البريد العشوائي',
   },
 };
 

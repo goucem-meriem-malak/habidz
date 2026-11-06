@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'l10n.dart';
+import 'brand.dart';
 
 /// Animated launch screen: logo pops in, app name slides up, then a soft
 /// cross-fade into [next]. Skips most of the animation if the phone has
@@ -14,8 +14,6 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
-  static const _ink = Color(0xFF3B0F8C); // matches the logo's outline color
-
   late final bool _reduce =
       WidgetsBinding.instance.platformDispatcher.accessibilityFeatures.disableAnimations;
   late final AnimationController _c = AnimationController(
@@ -71,7 +69,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               opacity: _logoFade,
               child: ScaleTransition(
                 scale: _logoScale,
-                child: Image.asset('assets/logo.png', width: 180, height: 180),
+                child: const LogoMark(size: 180, tint: Colors.black),
               ),
             ),
             const SizedBox(height: 8),
@@ -79,15 +77,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               opacity: _textFade,
               child: SlideTransition(
                 position: _textSlide,
-                child: Text(
-                  context.t('appName'),
-                  style: const TextStyle(
-                    color: _ink,
-                    fontSize: 34,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
-                  ),
-                ),
+                child: const BrandName(size: 22, color: Colors.black),
               ),
             ),
           ],

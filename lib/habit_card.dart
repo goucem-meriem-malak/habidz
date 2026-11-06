@@ -40,7 +40,7 @@ class HabitCard extends StatefulWidget {
   State<HabitCard> createState() => _HabitCardState();
 }
 
-class _HabitCardState extends State<HabitCard> {
+class _HabitCardState extends State<HabitCard> with AutomaticKeepAliveClientMixin {
   late final _DaysWatcher _w = _DaysWatcher(widget.habit.id);
 
   @override
@@ -52,7 +52,11 @@ class _HabitCardState extends State<HabitCard> {
   void _toggle(DateTime d, bool done) => habitRepo.setDay(widget.habit.id, d, !done);
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     final cs = Theme.of(context).colorScheme;
     final h = widget.habit;
     final accent = h.colorOrNull ?? cs.primary;
@@ -128,7 +132,7 @@ class _HabitCardState extends State<HabitCard> {
                 ],
               ),
               const SizedBox(height: 8),
-              HabitGrid(days: _w.days, accent: accent, onToggle: _toggle),
+              HabitGrid(days: _w.days, accent: accent, onToggle: _toggle, semanticLabel: h.name),
             ],
           ),
         );

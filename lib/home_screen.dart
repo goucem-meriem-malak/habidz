@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'auth_screen.dart' show authError;
+import 'brand.dart';
 import 'habit_card.dart';
 import 'habit_editor.dart';
 import 'habit_repo.dart';
@@ -39,13 +40,45 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _showVerify() {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (c) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(c.t('verifyBanner'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 8),
+            Text(c.t('checkSpam')),
+            const SizedBox(height: 16),
+            FilledButton(onPressed: _resend, child: Text(c.t('resend'))),
+            const SizedBox(height: 8),
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
+              onPressed: () async {
+                await _refreshVerified();
+                if (c.mounted && (FirebaseAuth.instance.currentUser?.emailVerified ?? false)) {
+                  Navigator.pop(c);
+                }
+              },
+              child: Text(c.t('iVerified')),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final user = FirebaseAuth.instance.currentUser;
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.t('appName'), style: const TextStyle(fontWeight: FontWeight.w800)),
+        title: const BrandName(size: 15),
         actions: [
           IconButton(
             tooltip: context.t('profile'),
@@ -62,18 +95,28 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         children: [
           if (user != null && !user.emailVerified)
-            Container(
-              margin: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
+              child: Material(
                 color: cs.primary.withAlpha(25),
                 borderRadius: BorderRadius.circular(14),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(14),
+                  onTap: _showVerify,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    child: Row(children: [
+                      Icon(Icons.mark_email_unread_outlined, size: 18, color: cs.primary),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(context.t('verifyShort'),
+                            maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13)),
+                      ),
+                      Icon(Icons.chevron_right, size: 18, color: cs.secondary),
+                    ]),
+                  ),
+                ),
               ),
-              child: Row(children: [
-                Expanded(child: Text(context.t('verifyBanner'))),
-                TextButton(onPressed: _resend, child: Text(context.t('resend'))),
-                TextButton(onPressed: _refreshVerified, child: Text(context.t('iVerified'))),
-              ]),
             ),
           Expanded(
             child: StreamBuilder<HabitsSnapshot>(

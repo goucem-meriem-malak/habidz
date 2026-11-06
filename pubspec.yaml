@@ -1,4 +1,4 @@
-name: habidz
+name: Habidz
 description: Habidz - a GitHub-grid habit tracker.
 publish_to: "none"
 version: 1.0.0+1
@@ -29,20 +29,26 @@ flutter:
   generate: false
   assets:
     - assets/logo.png
+  fonts:
+    - family: KronaOne
+      fonts:
+        - asset: assets/fonts/KronaOne-Regular.ttf
 
-# Native launch screen (shown before Flutter starts) - run: dart run flutter_native_splash:create
+# Native launch screen (plain white, then the animated in-app splash)
+# run: dart run flutter_native_splash:create
 flutter_native_splash:
   color: "#FFFFFF"
-  image: assets/logo_splash.png
   android_12:
     color: "#FFFFFF"
-    image: assets/logo_splash.png
 
-# App icon - run: dart run flutter_launcher_icons
+# App icon, generated from assets/logo.png
+# run: dart run flutter_launcher_icons
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: assets/logo_splash.png
+  image_path: assets/logo.png
   adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: assets/logo_splash.png
+  adaptive_icon_foreground: assets/logo.png
+  adaptive_icon_foreground_inset: 20
   remove_alpha_ios: true
+  background_color_ios: "#FFFFFF"

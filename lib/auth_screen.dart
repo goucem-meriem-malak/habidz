@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import 'brand.dart';
 import 'habit_repo.dart';
 import 'l10n.dart';
 
@@ -105,11 +106,9 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Icon(Icons.grid_view_rounded, size: 56, color: cs.primary),
+                    const Center(child: LogoMark(size: 96)),
                     const SizedBox(height: 12),
-                    Text(context.t('appName'),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w800)),
+                    const Center(child: BrandName(size: 22)),
                     const SizedBox(height: 4),
                     Text(context.t('tagline'),
                         textAlign: TextAlign.center, style: TextStyle(color: cs.secondary)),
