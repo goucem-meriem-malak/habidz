@@ -75,7 +75,7 @@ You need [Flutter](https://docs.flutter.dev/get-started/install) and an Android 
 
 1. **Get the code**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/habidz.git
+   git clone https://github.com/goucem-meriem-malak/habidz.git
    cd habidz
    flutter pub get
    ```
