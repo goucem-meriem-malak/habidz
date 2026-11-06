@@ -1,0 +1,48 @@
+name: habidz
+description: Habidz - a GitHub-grid habit tracker.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  firebase_core: ^3.6.0
+  firebase_auth: ^5.3.1
+  cloud_firestore: ^5.4.4
+  shared_preferences: ^2.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  flutter_native_splash: ^2.4.1
+  flutter_launcher_icons: ^0.14.1
+
+flutter:
+  uses-material-design: true
+  generate: false
+  assets:
+    - assets/logo.png
+
+# Native launch screen (shown before Flutter starts) - run: dart run flutter_native_splash:create
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/logo_splash.png
+  android_12:
+    color: "#FFFFFF"
+    image: assets/logo_splash.png
+
+# App icon - run: dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/logo_splash.png
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: assets/logo_splash.png
+  remove_alpha_ios: true
