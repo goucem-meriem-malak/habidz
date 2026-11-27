@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'auth_screen.dart' show authError;
+import 'glass.dart';
 import 'habit_repo.dart';
 import 'l10n.dart';
 import 'settings.dart';
@@ -21,9 +22,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<List<String>?> _ask(String title, List<String> labels, {bool obscure = true, List<String>? initial}) {
     final ctrls = [for (var i = 0; i < labels.length; i++) TextEditingController(text: initial?[i] ?? '')];
-    return showDialog<List<String>>(
+    return showGlassDialog<List<String>>(
       context: context,
-      builder: (c) => AlertDialog(
+      builder: (c) => GlassAlert(
         title: Text(title),
         content: SingleChildScrollView(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -87,9 +88,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _deleteAccount() async {
     final r = await _ask(context.t('deleteAcc'), [context.t('password')]);
     if (r == null || r[0].isEmpty) return;
-    final sure = await showDialog<bool>(
+    final sure = await showGlassDialog<bool>(
       context: context,
-      builder: (c) => AlertDialog(
+      builder: (c) => GlassAlert(
         title: Text(c.t('deleteAcc')),
         content: Text(c.t('deleteWarn')),
         actions: [
@@ -118,64 +119,86 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     Widget section(String k) => Padding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 6),
+          padding: const EdgeInsets.fromLTRB(24, 18, 24, 8),
           child: Text(context.t(k), style: TextStyle(color: cs.secondary, fontWeight: FontWeight.w700)),
         );
+    Widget group(List<Widget> children) => GlassCard(
+          padding: EdgeInsets.zero,
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          child: Material(color: Colors.transparent, child: Column(children: children)),
+        );
+    final divider = Divider(height: 1, indent: 56, color: cs.onSurface.withAlpha(24));
     final themes = {'system': 'tSystem', 'light': 'tLight', 'dark': 'tDark', 'purple': 'tPurple'};
     const langs = {'en': 'English', 'fr': 'Français', 'ar': 'العربية'};
-    return Scaffold(
+    return GlassScaffold(
       appBar: AppBar(title: Text(context.t('profile'))),
       body: ListenableBuilder(
         listenable: settings,
         builder: (context, _) => ListView(
           children: [
             section('accountSection'),
-            ListTile(
-              leading: const Icon(Icons.person_outline),
-              title: Text(_user.displayName ?? ''),
-              subtitle: Text(_user.email ?? ''),
-              trailing: IconButton(icon: const Icon(Icons.edit_outlined), tooltip: context.t('edit'), onPressed: _editName),
-            ),
+            group([
+              ListTile(
+                leading: const Icon(Icons.person_outline),
+                title: Text(_user.displayName ?? ''),
+                subtitle: Text(_user.email ?? ''),
+                trailing: IconButton(
+                    icon: const Icon(Icons.edit_outlined), tooltip: context.t('edit'), onPressed: _editName),
+              ),
+            ]),
             section('appearance'),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Wrap(spacing: 8, runSpacing: 8, children: [
-                for (final e in themes.entries)
-                  ChoiceChip(
-                    label: Text(context.t(e.value)),
-                    selected: settings.theme == e.key,
-                    onSelected: (_) => settings.setTheme(e.key),
-                  ),
-              ]),
+            GlassCard(
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(context.t('theme'), style: TextStyle(color: cs.secondary, fontSize: 12)),
+                  const SizedBox(height: 8),
+                  Wrap(spacing: 8, runSpacing: 8, children: [
+                    for (final e in themes.entries)
+                      ChoiceChip(
+                        label: Text(context.t(e.value)),
+                        selected: settings.theme == e.key,
+                        onSelected: (_) => settings.setTheme(e.key),
+                      ),
+                  ]),
+                  const SizedBox(height: 16),
+                  Text(context.t('language'), style: TextStyle(color: cs.secondary, fontSize: 12)),
+                  const SizedBox(height: 8),
+                  Wrap(spacing: 8, runSpacing: 8, children: [
+                    for (final e in langs.entries)
+                      ChoiceChip(
+                        label: Text(e.value),
+                        selected: settings.lang == e.key,
+                        onSelected: (_) => settings.setLang(e.key),
+                      ),
+                  ]),
+                ],
+              ),
             ),
-            const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Wrap(spacing: 8, runSpacing: 8, children: [
-                for (final e in langs.entries)
-                  ChoiceChip(
-                    label: Text(e.value),
-                    selected: settings.lang == e.key,
-                    onSelected: (_) => settings.setLang(e.key),
-                  ),
-              ]),
-            ),
-            const Divider(height: 32),
-            ListTile(leading: const Icon(Icons.lock_outline), title: Text(context.t('changePw')), onTap: _changePw),
-            ListTile(leading: const Icon(Icons.ios_share), title: Text(context.t('export')), onTap: _export),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: Text(context.t('logout')),
-              onTap: () async {
-                Navigator.of(context).popUntil((r) => r.isFirst);
-                await FirebaseAuth.instance.signOut();
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.delete_forever_outlined, color: cs.error),
-              title: Text(context.t('deleteAcc'), style: TextStyle(color: cs.error)),
-              onTap: _deleteAccount,
-            ),
+            const SizedBox(height: 18),
+            group([
+              ListTile(leading: const Icon(Icons.lock_outline), title: Text(context.t('changePw')), onTap: _changePw),
+              divider,
+              ListTile(leading: const Icon(Icons.ios_share), title: Text(context.t('export')), onTap: _export),
+              divider,
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: Text(context.t('logout')),
+                onTap: () async {
+                  Navigator.of(context).popUntil((r) => r.isFirst);
+                  await FirebaseAuth.instance.signOut();
+                },
+              ),
+            ]),
+            const SizedBox(height: 14),
+            group([
+              ListTile(
+                leading: Icon(Icons.delete_forever_outlined, color: cs.error),
+                title: Text(context.t('deleteAcc'), style: TextStyle(color: cs.error)),
+                onTap: _deleteAccount,
+              ),
+            ]),
             const SizedBox(height: 32),
           ],
         ),

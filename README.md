@@ -44,6 +44,9 @@
 
 - **GitHub-style grid.** Every habit is a card with a horizontally scrolling 53-week grid that opens on today. The list of habits scrolls vertically.
 - **One-tap check-in.** Mark today with one tap, fix any past day by tapping its square. Future days are locked.
+- **Reorder your habits.** Hold a card (or grab the handle) and drag it; the order is saved and synced.
+- **Month markers.** A small dot sits inside the first day of every month, so you can always find your place in the grid.
+- **Glass design.** Frosted, translucent cards and sheets over a soft glowing backdrop, in every theme.
 - **Streaks.** Current and best streak for every habit.
 - **Your own habits.** Name, one of 30 icons and a colour, or *Auto* for black and white that follows the theme.
 - **Archive or delete.** Hide a habit and keep its history, or delete it for good.
@@ -75,7 +78,7 @@ You need [Flutter](https://docs.flutter.dev/get-started/install) and an Android 
 
 1. **Get the code**
    ```bash
-   git clone https://github.com/goucem-meriem-malak/habidz.git
+   git clone https://github.com/YOUR_USERNAME/habidz.git
    cd habidz
    flutter pub get
    ```
@@ -113,7 +116,8 @@ lib/
   auth_screen.dart     sign in, sign up, reset password
   home_screen.dart     habit list, verify-email notice, offline notice
   habit_card.dart      one habit: title, check button, grid
-  habit_grid.dart      the painted grid and tap handling
+  habit_grid.dart      the painted grid, month dots and tap handling
+  glass.dart           glassmorphism kit (backdrop, cards, sheets, dialogs)
   habit_editor.dart    add, edit, archive, delete
   habit_repo.dart      all Firestore access
   habit.dart           model, date helpers, streaks

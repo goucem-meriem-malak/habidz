@@ -84,6 +84,10 @@ class HabitGrid extends StatelessWidget {
                           today: today,
                           accent: accent,
                           empty: empty,
+                          dotOnDone: ThemeData.estimateBrightnessForColor(accent) == Brightness.dark
+                              ? const Color(0xCCFFFFFF)
+                              : const Color(0xA6000000),
+                          dotOnEmpty: cs.onSurface.withAlpha(120),
                         ),
                       ),
                     ),
@@ -105,16 +109,19 @@ class _GridPainter extends CustomPainter {
     required this.today,
     required this.accent,
     required this.empty,
+    required this.dotOnDone,
+    required this.dotOnEmpty,
   });
 
   final Set<String> days;
   final DateTime firstMonday, today;
-  final Color accent, empty;
+  final Color accent, empty, dotOnDone, dotOnEmpty;
 
   @override
   void paint(Canvas canvas, Size size) {
     const cell = HabitGrid.cell, step = HabitGrid.step;
     final fill = Paint();
+    final dot = Paint();
     final ring = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.6
@@ -127,9 +134,15 @@ class _GridPainter extends CustomPainter {
           Rect.fromLTWH(c * step, r * step, cell, cell),
           const Radius.circular(4),
         );
-        fill.color = days.contains(dayKey(d)) ? accent : empty;
+        final done = days.contains(dayKey(d));
+        fill.color = done ? accent : empty;
         canvas.drawRRect(rect, fill);
         if (d == today) canvas.drawRRect(rect, ring);
+        // a small dot marks the 1st day of every month
+        if (d.day == 1) {
+          dot.color = done ? dotOnDone : dotOnEmpty;
+          canvas.drawCircle(Offset(c * step + cell / 2, r * step + cell / 2), 2.2, dot);
+        }
       }
     }
   }
@@ -139,6 +152,8 @@ class _GridPainter extends CustomPainter {
       old.days != days ||
       old.accent != accent ||
       old.empty != empty ||
+      old.dotOnDone != dotOnDone ||
+      old.dotOnEmpty != dotOnEmpty ||
       old.today != today ||
       old.firstMonday != firstMonday;
 }

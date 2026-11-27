@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 
+import 'glass.dart';
 import 'habit.dart';
 import 'habit_repo.dart';
 import 'l10n.dart';
 import 'theme.dart';
 
 Future<void> showHabitEditor(BuildContext context, {Habit? habit}) {
-  return showModalBottomSheet(
+  return showGlassSheet<void>(
     context: context,
-    isScrollControlled: true,
-    showDragHandle: true,
-    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
     builder: (_) => _Editor(habit: habit),
   );
 }
@@ -50,9 +48,9 @@ class _EditorState extends State<_Editor> {
   }
 
   Future<void> _delete() async {
-    final ok = await showDialog<bool>(
+    final ok = await showGlassDialog<bool>(
       context: context,
-      builder: (c) => AlertDialog(
+      builder: (c) => GlassAlert(
         content: Text(c.t('deleteHabitQ')),
         actions: [
           TextButton(onPressed: () => Navigator.pop(c, false), child: Text(c.t('cancel'))),

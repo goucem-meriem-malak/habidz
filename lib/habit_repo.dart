@@ -56,6 +56,16 @@ class HabitRepo {
     }, SetOptions(merge: true)).catchError((_) {});
   }
 
+  /// Saves the on-screen order: habit i gets order i (one batched write, not awaited).
+  void reorder(List<Habit> ordered) {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final b = _db.batch();
+    for (var i = 0; i < ordered.length; i++) {
+      b.update(_habits.doc(ordered[i].id), {'order': i, 'updatedAt': now});
+    }
+    b.commit().catchError((_) {});
+  }
+
   void setDay(String habitId, DateTime date, bool done) {
     final key = '${two(date.month)}-${two(date.day)}';
     _habits.doc(habitId).collection('years').doc('${date.year}').set({

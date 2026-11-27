@@ -2,9 +2,12 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'auth_screen.dart' show authError;
 import 'brand.dart';
+import 'glass.dart';
+import 'habit.dart';
 import 'habit_card.dart';
 import 'habit_editor.dart';
 import 'habit_repo.dart';
@@ -19,6 +22,33 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late final Stream<HabitsSnapshot> _stream = habitRepo.watchHabits();
+
+  /// Order shown right after a drag, until Firestore confirms it (prevents a flicker back).
+  List<String>? _localOrder;
+
+  List<Habit> _applyLocalOrder(List<Habit> server) {
+    final lo = _localOrder;
+    if (lo == null) return server;
+    final idx = {for (var i = 0; i < lo.length; i++) lo[i]: i};
+    final sorted = [...server];
+    sorted.sort((a, b) {
+      final ia = idx[a.id], ib = idx[b.id];
+      if (ia != null && ib != null) return ia.compareTo(ib);
+      if (ia != null) return -1;
+      if (ib != null) return 1;
+      return a.order.compareTo(b.order);
+    });
+    return sorted;
+  }
+
+  void _onReorder(List<Habit> current, int oldIndex, int newIndex) {
+    if (newIndex > oldIndex) newIndex -= 1;
+    final list = [...current];
+    final moved = list.removeAt(oldIndex);
+    list.insert(newIndex, moved);
+    setState(() => _localOrder = list.map((h) => h.id).toList());
+    habitRepo.reorder(list);
+  }
 
   Future<void> _resend() async {
     try {
@@ -41,32 +71,34 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showVerify() {
-    showModalBottomSheet<void>(
+    showGlassSheet<void>(
       context: context,
-      showDragHandle: true,
-      builder: (c) => Padding(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(c.t('verifyBanner'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
-            const SizedBox(height: 8),
-            Text(c.t('checkSpam')),
-            const SizedBox(height: 16),
-            FilledButton(onPressed: _resend, child: Text(c.t('resend'))),
-            const SizedBox(height: 8),
-            OutlinedButton(
-              style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
-              onPressed: () async {
-                await _refreshVerified();
-                if (c.mounted && (FirebaseAuth.instance.currentUser?.emailVerified ?? false)) {
-                  Navigator.pop(c);
-                }
-              },
-              child: Text(c.t('iVerified')),
-            ),
-          ],
+      builder: (c) => SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(c.t('verifyBanner'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 8),
+              Text(c.t('checkSpam')),
+              const SizedBox(height: 16),
+              FilledButton(onPressed: _resend, child: Text(c.t('resend'))),
+              const SizedBox(height: 8),
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
+                onPressed: () async {
+                  await _refreshVerified();
+                  if (c.mounted && (FirebaseAuth.instance.currentUser?.emailVerified ?? false)) {
+                    Navigator.pop(c);
+                  }
+                },
+                child: Text(c.t('iVerified')),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -76,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final user = FirebaseAuth.instance.currentUser;
-    return Scaffold(
+    return GlassScaffold(
       appBar: AppBar(
         title: const BrandName(size: 15),
         actions: [
@@ -87,21 +119,29 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: context.t('addHabit'),
-        onPressed: () => showHabitEditor(context),
-        child: const Icon(Icons.add),
+      floatingActionButton: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [BoxShadow(color: cs.primary.withAlpha(80), blurRadius: 24, spreadRadius: 1)],
+        ),
+        child: FloatingActionButton(
+          tooltip: context.t('addHabit'),
+          elevation: 0,
+          highlightElevation: 0,
+          onPressed: () => showHabitEditor(context),
+          child: const Icon(Icons.add),
+        ),
       ),
       body: Column(
         children: [
           if (user != null && !user.emailVerified)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
+            GlassCard(
+              radius: 14,
+              padding: EdgeInsets.zero,
+              margin: const EdgeInsets.fromLTRB(16, 4, 16, 10),
               child: Material(
-                color: cs.primary.withAlpha(25),
-                borderRadius: BorderRadius.circular(14),
+                color: Colors.transparent,
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(14),
                   onTap: _showVerify,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -128,7 +168,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (!snap.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                final habits = snap.data!.habits.where((h) => !h.archived).toList();
+                final visible = snap.data!.habits.where((h) => !h.archived).toList();
+                final habits = _applyLocalOrder(visible);
+                if (_localOrder != null &&
+                    habits.map((h) => h.id).join(',') == visible.map((h) => h.id).join(',')) {
+                  // the server caught up with our drag: stop overriding
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted && _localOrder != null) setState(() => _localOrder = null);
+                  });
+                }
                 return Column(
                   children: [
                     _OfflineBanner(fromCache: snap.data!.fromCache),
@@ -144,10 +192,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Text(context.t('emptySub'), style: TextStyle(color: cs.secondary)),
                               ]),
                             )
-                          : ListView.builder(
+                          : ReorderableListView.builder(
                               padding: const EdgeInsets.only(bottom: 96),
+                              buildDefaultDragHandles: false,
                               itemCount: habits.length,
-                              itemBuilder: (_, i) => HabitCard(key: ValueKey(habits[i].id), habit: habits[i]),
+                              onReorderStart: (_) => HapticFeedback.mediumImpact(),
+                              onReorder: (o, n) => _onReorder(habits, o, n),
+                              proxyDecorator: (child, index, animation) =>
+                                  Material(type: MaterialType.transparency, child: child),
+                              itemBuilder: (_, i) => ReorderableDelayedDragStartListener(
+                                key: ValueKey(habits[i].id),
+                                index: i,
+                                child: HabitCard(habit: habits[i], index: i),
+                              ),
                             ),
                     ),
                   ],

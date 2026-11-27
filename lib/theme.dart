@@ -5,9 +5,27 @@ ThemeData _build(ColorScheme cs, Color bg) => ThemeData(
       colorScheme: cs,
       scaffoldBackgroundColor: bg,
       appBarTheme: AppBarTheme(
-        backgroundColor: bg, foregroundColor: cs.onSurface, elevation: 0, scrolledUnderElevation: 0),
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        foregroundColor: cs.onSurface,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
       inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+        filled: true,
+        fillColor: cs.onSurface.withAlpha(14),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: cs.onSurface.withAlpha(50)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: cs.onSurface.withAlpha(50)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: cs.primary, width: 1.6),
+        ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(

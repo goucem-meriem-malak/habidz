@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'brand.dart';
+import 'glass.dart';
 import 'habit_repo.dart';
 import 'l10n.dart';
 
@@ -94,7 +95,7 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    return Scaffold(
+    return GlassScaffold(
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -113,6 +114,11 @@ class _AuthScreenState extends State<AuthScreen> {
                     Text(context.t('tagline'),
                         textAlign: TextAlign.center, style: TextStyle(color: cs.secondary)),
                     const SizedBox(height: 28),
+                    GlassCard(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
                     if (_signup) ...[
                       TextFormField(
                         controller: _name,
@@ -153,6 +159,9 @@ class _AuthScreenState extends State<AuthScreen> {
                       child: _busy
                           ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2))
                           : Text(context.t(_signup ? 'signup' : 'login')),
+                    ),
+                        ],
+                      ),
                     ),
                     if (!_signup)
                       TextButton(onPressed: _forgot, child: Text(context.t('forgot'))),

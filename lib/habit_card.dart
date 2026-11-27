@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
+import 'glass.dart';
 import 'habit.dart';
 import 'habit_editor.dart';
 import 'habit_grid.dart';
@@ -34,8 +35,9 @@ class _DaysWatcher extends ChangeNotifier {
 }
 
 class HabitCard extends StatefulWidget {
-  const HabitCard({super.key, required this.habit});
+  const HabitCard({super.key, required this.habit, required this.index});
   final Habit habit;
+  final int index; // position in the list (used by the drag handle)
   @override
   State<HabitCard> createState() => _HabitCardState();
 }
@@ -66,15 +68,12 @@ class _HabitCardState extends State<HabitCard> with AutomaticKeepAliveClientMixi
         final today = dateOnly(DateTime.now());
         final doneToday = _w.days.contains(dayKey(today));
         final st = computeStreaks(_w.days, today);
-        return Container(
+        return GlassCard(
           margin: const EdgeInsets.fromLTRB(16, 0, 16, 14),
           padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
-          decoration: BoxDecoration(
-            color: cs.surface,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: cs.onSurface.withAlpha(20)),
-          ),
-          child: Column(
+          child: Material(
+            color: Colors.transparent,
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
@@ -103,6 +102,13 @@ class _HabitCardState extends State<HabitCard> with AutomaticKeepAliveClientMixi
                           ),
                         ]),
                       ),
+                    ),
+                  ),
+                  ReorderableDragStartListener(
+                    index: widget.index,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                      child: Icon(Icons.drag_indicator, size: 20, color: cs.secondary.withAlpha(150)),
                     ),
                   ),
                   Semantics(
@@ -134,6 +140,7 @@ class _HabitCardState extends State<HabitCard> with AutomaticKeepAliveClientMixi
               const SizedBox(height: 8),
               HabitGrid(days: _w.days, accent: accent, onToggle: _toggle, semanticLabel: h.name),
             ],
+          ),
           ),
         );
       },

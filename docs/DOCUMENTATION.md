@@ -126,6 +126,12 @@ Firestore keeps a local database and queues writes. The home screen listens with
 
 **Logo (`assets/logo.png`)**: must be a single-colour PNG on a transparent background (about 512x512). The `LogoMark` widget recolours it to the theme's text colour (black on light, white on dark and purple), so one file works everywhere. The splash always uses black on white. A multi-colour logo would lose its colours with this approach; in that case use two files instead.
 
+**Glassmorphism (`glass.dart`)**: the theme colours are unchanged; glass is layered on top. `GlassBackground` paints soft glowing orbs (blue / violet / teal, or violet / magenta in the purple theme, pastel in light) behind every screen; `GlassScaffold` puts a transparent Scaffold on it. `GlassCard` is a translucent gradient surface with a light border and a top sheen, used for habit cards, the verify notice, the sign-in form and the profile groups. Sheets and dialogs use a real backdrop blur (`GlassSheet`, `showGlassDialog`) over a mostly opaque base, so the screen behind never shows through. Lists use the cheap no-blur version on purpose: the backdrop is smooth glows, so blur adds nothing visible but costs frame time on low-end phones.
+
+**Reordering**: the home list is a `ReorderableListView`. Hold a card, or grab the handle, to drag. The new order is written as `order = position` in one batched update and shown immediately (a local override hides the brief flicker until Firestore confirms). New habits get a large `order` value, so they always appear at the bottom.
+
+**Month markers**: `habit_grid.dart` draws a small dot in the cell of every 1st of the month (contrasting colour on filled and empty cells).
+
 **Name style (`brand.dart`)**: "HABIDZ" in Krona One with letter-spacing. Arabic has no glyphs in that font, so Arabic shows the translated name in the normal bold style.
 
 **App icon and splash**: `flutter_launcher_icons` builds the launcher icon (and Android adaptive icon with a white background) from `assets/logo.png`; `flutter_native_splash` makes the plain white native launch screen. Re-run both after changing the logo:
