@@ -35,8 +35,8 @@
   <tr>
     <td align="center"><img src="docs/screenshots/add-habit.jpg" width="200" alt="New habit"><br><sub>Pick an icon and colour</sub></td>
     <td align="center"><img src="docs/screenshots/profile.jpg" width="200" alt="Profile"><br><sub>Profile and settings</sub></td>
-    <td align="center"><img src="docs/screenshots/purple.jpg" width="200" alt="Purple theme"><br><sub>Premium purple theme</sub></td>
-    <td align="center"><img src="docs/screenshots/arabic.jpg" width="200" alt="Arabic"><br><sub>Arabic, right-to-left</sub></td>
+    <td align="center"><img src="docs/screenshots/purple-arabic.jpg" width="200" alt="Purple theme"><br><sub>Premium purple & Arabic</sub></td>
+    <td align="center"><img src="docs/screenshots/light-mode.jpg" width="200" alt="Arabic"><br><sub>Light Mode</sub></td>
   </tr>
 </table>
 
