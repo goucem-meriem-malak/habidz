@@ -40,7 +40,6 @@
   </tr>
 </table>
 
-
 ## Features
 
 - **GitHub-style grid.** Every habit is a card with a horizontally scrolling 53-week grid that opens on today. The list of habits scrolls vertically.
